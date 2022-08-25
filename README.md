@@ -3,7 +3,7 @@
 
 ![](./images/Intro.png)
 
-## About this Workshop
+## About 
 
 In this Project I'm showing a step by step tutorial to configure the **[Monitoring Solution for Kubernetes](https://github.com/oracle-quickstart/oci-kubernetes-monitoring)**
 
@@ -15,23 +15,35 @@ You can find the main project for deploying the Mushop at this **[link](https://
 Also, you can find the source project of this tutorial at this **[link](https://github.com/oracle-quickstart/oci-kubernetes-monitoring)**!
 ### Objectives
 
-In this workshop, you will learn how to:
 
 
 ### Prerequisites
 
--  This workshop requires an Oracle Cloud account with available credits, you may check out this **[video](https://www.youtube.com/watch?v=4U-0SumNz6w)** to help you signing up. You also can use a paid cloud account or a trial cloud account as well.
+-  This tutorial requires an Oracle Cloud account with available credits, you may check out this **[video](https://www.youtube.com/watch?v=4U-0SumNz6w)** to help you signing up. You also can use a paid cloud account or a trial cloud account as well.
   
 
 
 
-## **[Lab 1: Infrastructure Configuration](infrastructure/infrastructure.md)**
+## **[Task 1: Infrastructure Configuration](infrastructure/infrastructure.md)**
 
- In this lab we will build the infrastructure that we will use to run the rest of the workshop.  The sample application is a showcase of several Oracle Cloud Infrastructure services in a unified reference application. It implements an e-commerce platform built as a set of micro-services. The accompanying content can be used to get started with cloud native application development on Oracle Cloud Infrastructure.
+ First, we will build the infrastructure that we will use to run the rest of the workshop.  The sample application is a showcase of several Oracle Cloud Infrastructure services in a unified reference application. It implements an e-commerce platform built as a set of micro-services. The accompanying content can be used to get started with cloud native application development on Oracle Cloud Infrastructure.
 
- The repository contains the application code as well as the Terraform code, that creates all the required resources and configures the application on the created resources.
+ Let's start by obtaining the Mushop source code, the application code as well as the Terraform code, that creates all the required resources and configures the application on the created resources.
 
- we will also ingest the application logs into logging service which is a highly scalable and fully managed single pane of glass for all the logs in your tenancy. 
+- After you sign in into you tenant, open up the Cloud Shell and clone the github repo.
+
+```
+git clone https://github.com/oracle-quickstart/oci-cloudnative.git mushop
+```
+![](images/tenant.png)
+![](images/gitclone.png)
+
+```
+cd mushop/deploy/complete/terraform/
+terraform init
+```
+![](images/init.png)
+![](images/init2.png)
 ## **[Lab 2: Logging Analytics & Logging](logana/logana.md)**
 
  In this lab we will unleash the capabilites of Logging Analytics and review aggregated data in a dashboard and explore the available logs in the Log Explorer. 
