@@ -194,3 +194,29 @@ cd oci-kubernetes-monitoring/logan/kubernetes-resources/logs-collection/
  kubectl apply -f fluentd-daemonset.yaml 
 ```
 ![](images/logcollectkubctl.png)
+
+- To enable Kubernetes Objects collection, open the following path from the Code Editor 
+```
+/oci-kubernetes-monitoring/logan/kubernetes-resources/objects-collection/fluentd-deployment.yaml
+```
+![](images/objectpath.png)
+
+- Scroll down till line 76 and fill in with the information collected earlier for the log collection
+
+    Image URL
+    Log Group ID
+    Tenancy Namespace
+    Kubernetes Cluster OCID
+    Kubernetes Cluster Name
+
+And finally save the changes.
+
+![](images/objectsave.png)
+
+- Back to the cloud shell
+```
+Cd ..
+cd objects-collection/
+kubectl apply -f configmap-objects.yaml 
+kubectl apply -f fluentd-deployment.yaml 
+```
