@@ -121,7 +121,7 @@ Allow group <user_group_name> to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenanc
 
 ```
 
-     Note: As I'm using root compartment, I will be adding the policies for a tenancy wise for the workshop purpose, but for production as you might have different compartments and group you can adjust the statement based on the relevant ones.
+ Note: As I'm using root compartment, I will be adding the policies for a tenancy wise for the workshop purpose, but for production as you might have different compartments and group you can adjust the statement based on the relevant ones.
 ![](images/statement.png)   
 
 ## Task 3: Install the Helm
