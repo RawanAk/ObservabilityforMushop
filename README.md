@@ -24,7 +24,7 @@ Also, you can find the source project of this tutorial at this **[link](https://
 
 
 
-## **[Task 1: Infrastructure Configuration](infrastructure/infrastructure.md)**
+## Task 1: Infrastructure Configuration
 
  First, we will build the infrastructure that we will use to run the rest of the workshop.  The sample application is a showcase of several Oracle Cloud Infrastructure services in a unified reference application. It implements an e-commerce platform built as a set of micro-services. The accompanying content can be used to get started with cloud native application development on Oracle Cloud Infrastructure.
 
@@ -44,26 +44,153 @@ terraform init
 ```
 ![](images/init.png)
 ![](images/init2.png)
-## **[Lab 2: Logging Analytics & Logging](logana/logana.md)**
 
- In this lab we will unleash the capabilites of Logging Analytics and review aggregated data in a dashboard and explore the available logs in the Log Explorer. 
- Oracle Cloud Logging Analytics is a cloud solution in Oracle Cloud Infrastructure that lets you index, enrich, aggregate, explore, search, analyze, correlate, visualize and monitor all log data from your applications and system infrastructure.
+- Copy the template variable file, and before we apply the infrastructure with terraform, we need to set some variables, so to do so open the code editor:
+```
+cp terraform.tfvars.example terraform.tfvars
+```
+![](images/copy.png)
 
-## **[Lab 3: Database Management & Operation Insights](dbmngt/dbmngt.md)**
+- To open the terraform.tfvars file, click File>Open, and edit the path by addin the following extension 
+```
+/mushop/deploy/complete/terraform/terraform.tfvars
+```
+![](images/path.png)
+![](images/terraform.png)
+- Get the values from the Cloud Shell and copy them to the Code Editor
+Region:
+```
+echo $OCI_REGION
+```
+Tenancy:
+```
+echo $OCI_TENANCY
+```
+![](images/values.png)
+- If you aren't using the root compartment you can find Compartment ocid in from cloud shell as follows, replace <COMPARTMENT_NAME> by the name of the compartment.
 
- Database Management Cloud Service, DBAs get a unified console for on-premises and cloud databases with lifecycle database management capabilities for monitoring, performance management, tuning, and administration. Use advanced database fleet diagnostics and tuning to troubleshoot issues and optimize performance. 
- While Operations Insights is an OCI native service that provides holistic insight into database and host resource utilization and capacity.
- It also provides direct access to the Oracle Cloud Infrastructure Database Management service, which lets you take advantage of its real-time database performance and management capability with a single click.
+    ```
+    <copy>
+    oci iam compartment list \
+      --all \
+      --compartment-id-in-subtree true \
+      --query 'data[0].id' \
+      --name <COMPARTMENT_NAME>
+    </copy>
+    ```
+- Save the file
+![](./images/save.png)
+
+- Run the Terraform apply:
+    ```
+    <copy>
+      terraform apply -auto-approve
+    </copy>
+    ```
+- After 10 to 20 minutes the resources should be created.
+
+ You will see something like this:
+![](images/terraformrun.png)
+
+Note: if you get an error that could be due to the continous changes and updates applied on the Oracle Cloud, so mainly check if the basic resources are created such as (OKE Cluster, Compute Instances, DB instance, VCN), if those resources are there you can proceed in this lab then.
+![](images/okecluster.png)
+![](images/db.png)
+![](images/vcn.png)
+
+## Task 2: Logging Analytics
+
+- To start off with Logging Analytics the  Service must be enabled in the given OCI region as following 
+
+![](images/OandM.png)
+![](images/lainit.png)
+![](images/lainit2.png)
+
+Now to be able to start ingest data into O&M services we need  set some policies 
+- From the Menu > Identity & Security >Policies
+![](images/policy.png)
+
+As you can see the terraform has created a dynamic group that include all the relevant OCI instances 
+- Click mushop-tenancy-policies-LNWU> Edit Policy Statements
+![](images/policy2.png)
+
+- Click + Another Statement, make sure you change the dynamic group name and use the one in the above statement also for user group you can can use Adminstrators if you are using the trial.
+```
+Allow dynamic-group <dynamic_group_name> to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy
+Allow group <user_group_name> to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy
+
+
+```
+
+     Note: As I'm using root compartment, I will be adding the policies for a tenancy wise for the workshop purpose, but for production as you might have different compartments and group you can adjust the statement based on the relevant ones.
+![](images/statement.png)   
+
+## Task 3: Install the Helm
+
+ Back to the Cloud shell download the source code for the helm chart
+
+```
+ git clone https://github.com/oracle-quickstart/oci-kubernetes-monitoring.git
+```
+![](images/helm.png)
+
+```
+Cd oci-kubernetes-monitoring 
+```
+- Docker Image
+We will be using this pre-built image to create a custom image using this image as a base image it includes all the required dependencies. 
+```
+docker pull fra.ocir.io/fruktknlrefu/fluentd_oci_la:20220307
+```
+![](images/docker.png)
+
+- Deploying Kuberenetes resources using Kubectl
+
+The Kubernetes resources can be found in kubernetes-resources directory, these yaml files inside it needs to be applied using kubectl to create the necessary resources that enables the logs collection into Logging Analytics through a Fluentd based DaemonSet. As you scrollm down to line 69you see that we need to replace some information related to the OKE cluster, log group…make sure you save those info on a local text file as we will need them again later in the object collection
+
+- To enable Logs collection, Open code editor and add the following path to access the fluentd file for logs collection
+```
+/oci-kubernetes-monitoring/logan/kubernetes-resources/logs-collection/fluentd-daemonset.yaml
+```
+![](images/logscollect.png)
+
+
+- First we will add the Image URL which is in this case 
+```
+fra.ocir.io/fruktknlrefu/fluentd_oci_la:20220307
+```
+![](images/fluent1.png)
+
+Then we need to get log group id which refers to the logging analytics log group
+
+- From the menu>Observability & Management>Logging Analytics>Administration>Log Groups
+![](images/loggroup1.png)
+
+- Click on log groups>default, copy OCID and paste it in the code editor
+![](images/loggroup2.png)
+![](images/codeeditlg.png)
+
+- On the top right corner click on profile button and select Tenancy, under the Object storage settings copy the Object storage namespace and paste it to the code editor
+![](images/namespace.png)
+![](images/namespace2.png)
+
+- Now to get the OKE related information, go to the Kubernetes cluster created earlier and copy Cluster Id and cluster name and finally paste them into the code editor 
+![](images/oke.png)
+![](images/codeeditoke.png)
+
+- Save the file from File>Save
+![](images/save1.png)
+
+- Back to the cloud shell above 
+```
+cd oci-kubernetes-monitoring/logan/kubernetes-resources/logs-collection/
+```
+- Apply the yaml files in the sequence of configmap-docker.yaml(or configmap-cri.yaml), secrets.yaml (not required for default auth type) and fluentd-daemonset.yaml.
+
+```
+ kubectl apply -f configmap-docker.yaml 
  
-## **[Lab 4: Monitoring](monitor/monitor.md)**
+ kubectl apply -f secrets.yaml 
 
-The Oracle Cloud Infrastructure Monitoring service uses metrics  to monitor resources and alarms  to notify you when these metrics meet alarm-specified triggers. 
-
-## **[Lab 5: Outage Simulation](simulation/simulation.md)**
-
-This step showcases the a load file deployed to the application which will create a sudden increase in the API server request and we will see how the alarms firing works and we will notice the change in the dashboards.
-
-Ready? let's start learning!
-
-
-
+ kubectl apply -f fluentd-daemonset.yaml 
+```
+![](images/logcollectkubctl.png)
