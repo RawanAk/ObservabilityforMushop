@@ -182,8 +182,15 @@ Then we need to get log group id which refers to the logging analytics log group
 
 - Back to the cloud shell above 
 ```
-cd oci-kubernetes-monitoring/logan/kubernetes-resources/logs-collection/
+cd kubernetes-resources/logs-collection/
 ```
+- To apply those yaml files with kubctl make sure you are accessed to the OKE cluster created earlier in task 1.
+
+![](images/accessoke1.png)
+![](images/accessoke2.png)
+![](images/accessoke3.png)
+![](images/accessoke4.png)
+![](images/accessoke5.png)
 - Apply the yaml files in the sequence of configmap-docker.yaml(or configmap-cri.yaml), secrets.yaml (not required for default auth type) and fluentd-daemonset.yaml.
 
 ```
@@ -220,3 +227,30 @@ cd objects-collection/
 kubectl apply -f configmap-objects.yaml 
 kubectl apply -f fluentd-deployment.yaml 
 ```
+![](images/objectkbectl.png)
+
+- Deploying Kuberenetes resources using Helm, first install helm
+```
+cd ..
+cd ..
+cd helm-chart/
+git clone https://github.com/helm/helm.git
+cd helm
+make
+```
+
+![](images/helminstall.png)
+
+- From the Code Editor we need to open the values.yaml and add the info we added earlier to fluentd, the path to the file is:
+```
+/oci-kubernetes-monitoring/logan/helm-chart/values.yaml
+```
+
+![](images/valuesyaml.png)
+
+- Back to the Cloud shell run the following:
+```
+helm install <release-name> --values <path-to-external-values.yaml> <path-to-helm-chart>
+```
+- Finally, after you install the helm release you can browse to the Logging Analytics to see that data started to load.
+![](images/logexplorer.png)
