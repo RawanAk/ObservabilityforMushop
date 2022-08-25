@@ -272,3 +272,4 @@ cd mushop/deploy/complete/terraform/
 terraform destroy
 ```
 ![](images/destroy.png)
+
