@@ -253,4 +253,22 @@ make
 helm install <release-name> --values <path-to-external-values.yaml> <path-to-helm-chart>
 ```
 - Finally, after you install the helm release you can browse to the Logging Analytics to see that data started to load.
+![](images/helmrelease.png)
 ![](images/logexplorer.png)
+
+If you want to discover the Logging Analytics capabilities (Machine learning Analysis, Visualizations, Dashboards) you can check this **[project](https://github.com/RawanAk/OMWorkshop/blob/main/logana/logana.md)** where i explained in details those pionts.
+
+## Task 4: Destroy the resources
+
+- Use the following helm uninstall command to delete the chart. Provide the release name used when creating the chart.
+```
+helm uninstall <release-name>
+```
+- Clean Up MuShop cluster, from the Cloud Shell run the following:
+
+```
+cd ~
+cd mushop/deploy/complete/terraform/
+terraform destroy
+```
+![](images/destroy.png)
